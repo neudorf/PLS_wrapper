@@ -207,7 +207,7 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     
     if type(num_subj_lst) is list:
         num_subj_lst = [matlab.double(x) for x in num_subj_lst.copy()]
-        num_subj_lst = [num_subj_lst]
+        #num_subj_lst = [num_subj_lst]
     elif type(num_subj_lst) is int:
         num_subj_lst = [matlab.double(num_subj_lst)]
 
