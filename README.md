@@ -73,14 +73,11 @@ meancentering_type  :   int, default=0. Type of meancentering.
                         are modulated by group membership. (Boost condition
                         differences, remove overall group diffrences).
                         1. Remove grand condition means from each group 
-                        condition
-                        mean. Tells us how conditions are modulated by 
-                        group 
-                        membership (Boost group differences, remove overall
-                        condition diffrences).
+                        condition mean. Tells us how conditions are 
+                        modulated by group membership (boost group 
+                        differences, remove overall condition diffrences).
                         2. Remove grand mean over all subjects and 
-                        conditions.
-                        Tells us full spectrum of condition and group 
+                        conditions. Tells us full spectrum of condition and group 
                         effects.
                         3. Remove all main effects by subtracting condition
                         and group means. This type of analysis will deal
