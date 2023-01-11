@@ -6,6 +6,7 @@
 - Only other requirement is numpy
 - Works just like the original matlab implementation, but takes numpy ndarray matrices and python types as input
 - Outputs an object containing the same variables as the matlab implementation, but converted to ndarrays and python types
+- Warning that this creates (and removes when finished) a matlab script called `pls_analysis_py.m` to call `pls_analysis.m` from the matlab PLS package and removes the `field_descrip` variable (character arrays are problematic, and this variable is not necessary), so make sure there isn't a script called `pls_analysis_py.m` in your working directory that you don't want deleted (not likely but worth mentioning).
 
 To install:
 ```
@@ -39,6 +40,13 @@ Python wrapper for matlab implementation of pls_analysis.
 Will use matlab python library to call the original matlab script.
 Uses the `pls_analysis_py.m` function in the same folder which drops the 
 unsupported character array `field_descrip`.
+Warning that this creates (and removes when finished) a matlab script 
+called `pls_analysis_py.m` to call `pls_analysis.m` from the matlab PLS 
+package and removes the `field_descrip` variable (character arrays are 
+problematic, and this variable is not necessary), so make sure there isn't 
+a script called `pls_analysis_py.m` in your working directory that you 
+don't want deleted (not likely but worth mentioning).
+
 Parameters
 ----------
 datamat_lst         :   list of 2D ndarrays, one for each group. 
