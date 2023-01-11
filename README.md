@@ -15,9 +15,9 @@ python -m pip install .
 Example usage for a single group, where X is a 2D numpy matrix with each 
 row representing the neuroimaging data for each subject for each condition,
 subjects_n is the number of subjects examined, 1 is the number of 
-conditions, Y is the behavioural data with each column representing a 
-behavioural variable, num_perm is the number of permutations, and num_boot 
-is the number of bootstrap samples:
+conditions, Y is the behavioural data as a 2D numpy matrixwith each column
+representing a behavioural variable, num_perm is the number of
+permutations, and num_boot is the number of bootstrap samples:
 ```
 from PLS_wrapper import pls
 res = pls.pls_analysis(X,[subjects_n],1,Y,num_perm=1000,num_boot=1000)
