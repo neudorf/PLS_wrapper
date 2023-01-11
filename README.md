@@ -22,7 +22,12 @@ representing a behavioural variable, num_perm is the number of
 permutations, and num_boot is the number of bootstrap samples:
 ```
 from PLS_wrapper import pls
-res = pls.pls_analysis(X,[subjects_n],1,Y,num_perm=1000,num_boot=1000)
+res = pls.pls_analysis(X,subjects_n,1,Y,num_perm=1000,num_boot=1000)
+```
+Or for multiple groups:
+```
+from PLS_wrapper import pls
+res = pls.pls_analysis([X1,X2],[group1_n,group2_n],1,Y,num_perm=1000,num_boot=1000)
 ```
 Docstring:
 ```
