@@ -176,8 +176,8 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
                             6. dot product
     boot_type           :   string, default = 'strat'. Use 'nonstrat' for 
                             nonstratified boot samples.
-    clim                :   float, default=95.0. Confidence level between 0 and
-                            100.
+    clim                :   float, default=95.0. Confidence level between 0.0 
+                            and 100.0.
 
     Return
     ------
