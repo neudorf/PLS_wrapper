@@ -160,7 +160,7 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     
     Return
     ------
-    res_py                 :   Object containing same outputs as original matlab script, with same names, converted to python native types.
+    res_py              :   Object containing same outputs as original matlab script, with same names, converted to python native types.
                             Matlab single and double arrays are converted to numpy ndarrays.
                             Floats used as booleans in matlab (0.0 for False, 1.0 for True) are converted to boolean.
                             Integers or floats being used as integers in matlab converted to int in python.
