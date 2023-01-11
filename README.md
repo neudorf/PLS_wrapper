@@ -6,6 +6,7 @@
 - Only other requirement is numpy
 - Works just like the original matlab implementation, but takes numpy ndarray matrices and python types as input
 - Outputs an object containing the same variables as the matlab implementation, but converted to ndarrays and python types
+
 To install:
 ```
 git clone https://github.com/neudorf/PLS_wrapper.git
