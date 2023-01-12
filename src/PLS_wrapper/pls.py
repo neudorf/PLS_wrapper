@@ -150,7 +150,7 @@ def PLS_matlab_2_python(res):
         elif key in float_to_int:
             new_value = int(value)
         elif key == 'num_subj_lst':
-            new_value = np.array(value,dtyp=np.int64)
+            new_value = np.array(value,dtype=np.int64)
         elif key in 'perm_result':
             new_value = perm_result_values_conversion(value)
             new_value = Dict2Object(new_value)
