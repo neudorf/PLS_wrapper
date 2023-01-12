@@ -180,8 +180,6 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     ):
     """Python wrapper for matlab implementation of pls_analysis.
     Will use matlab python library to call the original matlab script.
-    Uses the `pls_analysis_py.m` function in the same folder which drops the 
-    unsupported character array `field_descrip`.
     Warning that this creates (and removes when finished) a matlab script 
     called `pls_analysis_py.m` to call `pls_analysis.m` from the matlab PLS 
     package and removes the `field_descrip` variable (character arrays are 
