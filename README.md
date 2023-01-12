@@ -6,7 +6,7 @@
 - Only other requirement is numpy
 - Works just like the original matlab implementation, but takes numpy ndarray matrices and python types as input
 - Outputs an object containing the same variables as the matlab implementation, but converted to ndarrays and python types
-- Warning that this creates (and removes when finished) a matlab script called `pls_analysis_py.m` to call `pls_analysis.m` from the matlab PLS package and removes the `field_descrip` variable (character arrays are problematic, and this variable is not necessary), so make sure there isn't a script called `pls_analysis_py.m` in your working directory that you don't want deleted (not likely but worth mentioning).
+- Warning that this creates (and removes when finished) a matlab script called `pls_analysis_py.m` to call `pls_analysis.m` from the matlab PLS package and removes the `field_descrip` variable (character arrays are problematic, and this variable is not necessary), so make sure there isn't a script called `pls_analysis_py.m` in your working directory that you don't want deleted (not likely but worth mentioning). If you want to avoid the need for this you can copy the `pls_analysis_py.m` script from this repository to your PLS directory or a matlab path directory and set `make_script=False`.
 
 To install:
 ```
@@ -24,7 +24,7 @@ permutations, and num_boot is the number of bootstrap samples:
 from PLS_wrapper import pls
 res = pls.pls_analysis(X,subjects_n,1,Y,num_perm=1000,num_boot=1000)
 ```
-Or for multiple groups:
+Or for multiple groups, where X1 and X2 are 2D numpy matrices representing the neuroimaging data for subjects in group 1 and 2 respectively, and group1_n and group2_n are the number of subjects in groups 1 and 2 respectively:
 ```
 from PLS_wrapper import pls
 res = pls.pls_analysis([X1,X2],[group1_n,group2_n],1,Y,num_perm=1000,num_boot=1000)
@@ -77,8 +77,8 @@ meancentering_type  :   int, default=0. Type of meancentering.
                         modulated by group membership (boost group 
                         differences, remove overall condition diffrences).
                         2. Remove grand mean over all subjects and 
-                        conditions. Tells us full spectrum of condition and group 
-                        effects.
+                        conditions. Tells us full spectrum of condition and 
+                        group effects.
                         3. Remove all main effects by subtracting condition
                         and group means. This type of analysis will deal
                         with pure group by condition interaction.
@@ -91,6 +91,10 @@ boot_type           :   string, default = 'strat'. Use 'nonstrat' for
                         nonstratified boot samples.
 clim                :   float, default=95.0. Confidence level between 0.0 
                         and 100.0.
+make_script         :   bool, default=True. Whether to make and delete the
+                        pls_analysis_py.m file in the working directory.
+                        If you have copied this file to the PLS directory
+                        or a matlab path folder you can set this to False.
 
 Return
 ------
