@@ -3,6 +3,8 @@ import numpy as np
 import os
 
 class Dict2Object:
+    """Takes a dictionary and turns it into a class with an attribute for each key.
+    """
     def __init__(self, dict=None):
         if dict is not None:
             for key, value in dict.items():
@@ -14,7 +16,7 @@ def perm_result_values_conversion(res_dict_value):
     matlab_double_arrays = [
         'sp',
         'sprob',
-        'persamp'
+        'permsamp'
     ]
     new_dict = {}
     for key, value in res_dict_value.items():
@@ -24,6 +26,37 @@ def perm_result_values_conversion(res_dict_value):
             new_value = int(value)
         elif key == 'is_perm_splithalf':
             new_value = bool(int(value))
+        else:
+            new_value = value
+        new_dict[key] = new_value
+    return new_dict
+
+def perm_splithalf_values_conversion(res_dict_value):
+    """Decides how to convert inner values from dict valued PLS result `perm_splithalf`
+    """
+    matlab_double_arrays = [
+        'orig_ucorr',
+        'orig_vcorr',
+        'ucorr_prob',
+        'vcorr_prob',
+        'ucorr_ll',
+        'ucorr_ul',
+        'vcorr_ll',
+        'vcorr_ul'
+    ]
+    float_to_int = [
+        'num_outer_perm',
+        'num_split'
+    ]
+
+    new_dict = {}
+    for key, value in res_dict_value.items():
+        if key in matlab_double_arrays:
+            new_value = np.array(value)
+        elif key in float_to_int:
+            new_value = int(value)
+        else:
+            new_value = value
         new_dict[key] = new_value
     return new_dict
 
@@ -56,6 +89,10 @@ def boot_result_values_conversion(res_dict_value):
         'compare_u',
         'u_se',
     ]
+    ndarray_to_str = [
+        'boot_type'
+    ]
+
     new_dict = {}
     for key, value in res_dict_value.items():
         if key in float_to_int:
@@ -66,6 +103,10 @@ def boot_result_values_conversion(res_dict_value):
             new_value = np.array(value)
         elif key in matlab_double_arrays_to_int_numpy:
             new_value = np.array(value,dtype=np.int64)
+        elif key in ndarray_to_str:
+            new_value = str(value)
+        else:
+            new_value = value
         new_dict[key] = new_value
     return new_dict
 
@@ -78,6 +119,8 @@ def other_input_values_conversion(res_dict_value):
             new_value = bool(value)
         elif key == 'cormode':
             new_value = bool(int(value))
+        else:
+            new_value = value
         new_dict[key] = new_value
     return new_dict
 
@@ -93,27 +136,36 @@ def PLS_matlab_2_python(res):
         'vsc',
         'stacked_behavdata'
     ]
+    float_to_int = [
+        'num_conditions'
+    ]
     res_new = {}
-    if res is not None:
-        for key, value in res.items():
-            if key == 'is_struct':
-                new_value = bool(int(value))
-            elif key == 'datamatcorrs_lst':
-                new_value = np.array(value[0])
-            elif key in matlab_single_arrays:
-                new_value = np.array(value)
-            elif key in 'perm_result':
-                new_value = perm_result_values_conversion(value)
-                new_value = Dict2Object(new_value)
-            elif key in 'boot_result':
-                new_value = boot_result_values_conversion(value)
-                new_value = Dict2Object(new_value)
-            elif key in 'other_input':
-                new_value = other_input_values_conversion(value)
-                new_value = Dict2Object(new_value)
-            else:
-                new_value = value
-            res_new[key] = new_value
+    for key, value in res.items():
+        if key == 'is_struct':
+            new_value = bool(int(value))
+        elif key == 'datamatcorrs_lst':
+            new_value = np.array(value[0])
+        elif key in matlab_single_arrays:
+            new_value = np.array(value)
+        elif key in float_to_int:
+            new_value = int(value)
+        elif key == 'num_subj_lst':
+            new_value = np.array(value,dtyp=np.int64)
+        elif key in 'perm_result':
+            new_value = perm_result_values_conversion(value)
+            new_value = Dict2Object(new_value)
+        elif key in 'perm_splithalf':
+            new_value = perm_splithalf_values_conversion(value)
+            new_value = Dict2Object(new_value)
+        elif key in 'boot_result':
+            new_value = boot_result_values_conversion(value)
+            new_value = Dict2Object(new_value)
+        elif key in 'other_input':
+            new_value = other_input_values_conversion(value)
+            new_value = Dict2Object(new_value)
+        else:
+            new_value = value
+        res_new[key] = new_value
     return Dict2Object(res_new)
 
 def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
@@ -123,7 +175,8 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     meancentering_type=0,
     cormode=0,
     boot_type='strat',
-    clim=95.0
+    clim=95.0,
+    make_script=True
     ):
     """Python wrapper for matlab implementation of pls_analysis.
     Will use matlab python library to call the original matlab script.
@@ -134,7 +187,10 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     package and removes the `field_descrip` variable (character arrays are 
     problematic, and this variable is not necessary), so make sure there isn't 
     a script called `pls_analysis_py.m` in your working directory that you 
-    don't want deleted (not likely but worth mentioning).
+    don't want deleted (not likely but worth mentioning). If you want to 
+    avoid the need for this you can copy the `pls_analysis_py.m` script from 
+    this repository to your PLS directory or a matlab path directory and set 
+    `make_script=False`.
 
     Parameters
     ----------
@@ -178,6 +234,10 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
                             nonstratified boot samples.
     clim                :   float, default=95.0. Confidence level between 0.0 
                             and 100.0.
+    make_script         :   bool, default=True. Whether to make and delete the
+                            pls_analysis_py.m file in the working directory.
+                            If you have copied this file to the PLS directory
+                            or a matlab path folder you can set this to False.
 
     Return
     ------
@@ -195,21 +255,18 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     eng = matlab.engine.start_matlab()
 
     # Matlab script for calling pls_analysis.m and removing 'field_descrip'
-    temp_script =    'function result = pls_analysis_py(datamat_lst, num_subj_lst, k, opt)\n' \
-                '    result_tmp = pls_analysis(datamat_lst, num_subj_lst, k, opt);\n' \
-                '    result = rmfield(result_tmp,"field_descrip");'
+    if make_script:
+        temp_script =   'function result = pls_analysis_py(datamat_lst, num_subj_lst, k, opt)\n' \
+                        '    result_tmp = pls_analysis(datamat_lst, num_subj_lst, k, opt);\n' \
+                        '    result = rmfield(result_tmp,"field_descrip");'
 
-    with open('pls_analysis_py.m','w+') as f:
-        f.write(temp_script)
+        with open('pls_analysis_py.m','w+') as f:
+            f.write(temp_script)
 
     if type(datamat_lst) is np.ndarray:
         datamat_lst = [datamat_lst.copy()]
-    
-    if type(num_subj_lst) is list:
-        num_subj_lst = [matlab.double(x) for x in num_subj_lst.copy()]
-        #num_subj_lst = [num_subj_lst]
-    elif type(num_subj_lst) is int:
-        num_subj_lst = [matlab.double(num_subj_lst)]
+
+    num_subj_lst = matlab.double(num_subj_lst)
 
     stacked_behavdata = matlab.double(stacked_behavdata.copy())
 
@@ -229,6 +286,7 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     res = eng.pls_analysis_py(datamat_lst,num_subj_lst,num_cond,option)
     res_py = PLS_matlab_2_python(res)
 
-    os.remove('pls_analysis_py.m')
+    if make_script:
+        os.remove('pls_analysis_py.m')
 
     return res_py
