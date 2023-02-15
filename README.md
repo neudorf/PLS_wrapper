@@ -20,17 +20,17 @@ subjects_n is the number of subjects examined, 1 is the number of
 conditions, Y is the behavioural data as a 2D numpy matrix with each column
 representing a behavioural variable, num_perm is the number of
 permutations, and num_boot is the number of bootstrap samples:
-```
+```python
 from PLS_wrapper import pls
 res = pls.pls_analysis(X,subjects_n,1,Y,num_perm=1000,num_boot=1000)
 ```
 Or for multiple groups, where X1 and X2 are 2D numpy matrices representing the neuroimaging data for subjects in group 1 and 2 respectively, and group1_n and group2_n are the number of subjects in groups 1 and 2 respectively:
-```
+```python
 from PLS_wrapper import pls
 res = pls.pls_analysis([X1,X2],[group1_n,group2_n],1,Y,num_perm=1000,num_boot=1000)
 ```
 Docstring:
-```
+```python
 pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     num_perm=0,
     num_split=0,
@@ -40,7 +40,7 @@ pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     boot_type='strat',
     clim=95.0
     )
-    
+""" 
 Python wrapper for matlab implementation of pls_analysis.
 Will use matlab python library to call the original matlab script.
 Warning that this creates (and removes when finished) a matlab script 
@@ -106,4 +106,5 @@ res_py              :   Object containing same outputs as original matlab
                         Integers or floats being used as integers in matlab
                         converted to int in python.
                         Floats as python floats.
+"""
 ```
