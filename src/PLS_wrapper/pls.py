@@ -5,14 +5,24 @@ import os
 class Dict2Object:
     """Takes a dictionary and turns it into a class with an attribute for each key.
     """
-    def __init__(self, dict=None):
-        if dict is not None:
-            for key, value in dict.items():
+    def __init__(self, dictionary=None):
+        if dictionary is not None:
+            for key, value in dictionary.items():
                 setattr(self, key, value)
 
-def perm_result_values_conversion(res_dict_value):
+def perm_result_values_conversion(res_dict_value, convert_to):
     """Decides how to convert inner values from dict valued PLS result `perm_result`
+    Parameters
+    ----------
+    res_dict_value      :   dictionary from `other_input`
+    convert_to          :   string, choose whether converting to 'python' or
+                            'matlab'
+    Return
+    ------
+    new_dict            :   converted dictionary
     """
+    assert convert_to in ['python','matlab']
+
     matlab_double_arrays = [
         'sp',
         'sprob',
@@ -21,19 +31,38 @@ def perm_result_values_conversion(res_dict_value):
     new_dict = {}
     for key, value in res_dict_value.items():
         if key in matlab_double_arrays:
-            new_value = np.array(value)
+            if convert_to == 'python':
+                new_value = np.array(value)
+            elif convert_to == 'matlab':
+                new_value = matlab.double(value)
         elif key == 'num_perm':
-            new_value = int(value)
+            if convert_to == 'python':
+                new_value = int(value)
+            elif convert_to == 'matlab':
+                new_value = float(value)
         elif key == 'is_perm_splithalf':
-            new_value = bool(int(value))
+            if convert_to == 'python':
+                new_value = bool(int(value))
+            elif convert_to == 'matlab':
+                new_value = float(value)
         else:
             new_value = value
         new_dict[key] = new_value
     return new_dict
 
-def perm_splithalf_values_conversion(res_dict_value):
+def perm_splithalf_values_conversion(res_dict_value, convert_to):
     """Decides how to convert inner values from dict valued PLS result `perm_splithalf`
+    Parameters
+    ----------
+    res_dict_value      :   dictionary from `other_input`
+    convert_to          :   string, choose whether converting to 'python' or
+                            'matlab'
+    Return
+    ------
+    new_dict            :   converted dictionary
     """
+    assert convert_to in ['python','matlab']
+
     matlab_double_arrays = [
         'orig_ucorr',
         'orig_vcorr',
@@ -52,23 +81,42 @@ def perm_splithalf_values_conversion(res_dict_value):
     new_dict = {}
     for key, value in res_dict_value.items():
         if key in matlab_double_arrays:
-            new_value = np.array(value)
+            if convert_to == 'python':
+                new_value = np.array(value)
+            elif convert_to == 'matlab':
+                new_value = matlab.double(value)
         elif key in float_to_int:
-            new_value = int(value)
+            if convert_to == 'python':
+                new_value = int(value)
+            elif convert_to == 'matlab':
+                new_value = float(value)
         else:
             new_value = value
         new_dict[key] = new_value
     return new_dict
 
-def boot_result_values_conversion(res_dict_value):
+def boot_result_values_conversion(res_dict_value, convert_to):
     """Decides how to convert inner values from dict valued PLS result `boot_result`
+    Parameters
+    ----------
+    res_dict_value      :   dictionary from `other_input`
+    convert_to          :   string, choose whether converting to 'python' or
+                            'matlab'
+    Return
+    ------
+    new_dict            :   converted dictionary
     """
+    assert convert_to in ['python','matlab']
+
     float_to_int = [
         'num_boot',
-        'countnewtotal'
+        'countnewtotal',
     ]
     float_to_bool = [
         'nonrotated_boot',
+    ]
+    ndarray_to_float = [
+        'clim',
     ]
     matlab_double_arrays_to_float_numpy = [
         'num_LowVariability_behav_boots',
@@ -79,6 +127,7 @@ def boot_result_values_conversion(res_dict_value):
         'badbeh',
         'prop',
         'distrib',
+        'zero_u_se',
     ]
     matlab_double_arrays_to_int_numpy = [
         'bootsamp_4beh',
@@ -90,19 +139,36 @@ def boot_result_values_conversion(res_dict_value):
         'u_se',
     ]
     ndarray_to_str = [
-        'boot_type'
+        'boot_type',
     ]
 
     new_dict = {}
     for key, value in res_dict_value.items():
         if key in float_to_int:
-            new_value = int(value)
+            if convert_to == 'python':
+                new_value = int(value)
+            elif convert_to == 'matlab':
+                new_value = float(value)
         elif key in float_to_bool:
-            new_value = bool(int(value))
-        elif key in matlab_double_arrays_to_float_numpy or matlab_single_arrays:
-            new_value = np.array(value)
+            if convert_to == 'python':
+                new_value = bool(int(value))
+            elif convert_to == 'matlab':
+                new_value = float(value)
+        elif key in ndarray_to_float:
+            new_value = float(value)
+        elif (key in matlab_double_arrays_to_float_numpy) or (key in matlab_single_arrays):
+            if convert_to == 'python':
+                new_value = np.array(value)
+            elif (convert_to == 'matlab') and (key in matlab_double_arrays_to_float_numpy):
+                new_value = matlab.double(value)
+            elif (convert_to == 'matlab') and (key in matlab_single_arrays):
+                new_value = matlab.single(value)
         elif key in matlab_double_arrays_to_int_numpy:
-            new_value = np.array(value,dtype=np.int64)
+            if convert_to == 'python':
+                new_value = np.array(value,dtype=np.int64)
+            elif convert_to == 'matlab':
+                new_value = np.array(value,dtype=np.float64)
+                new_value = matlab.double(new_value)
         elif key in ndarray_to_str:
             new_value = str(value)
         else:
@@ -110,23 +176,50 @@ def boot_result_values_conversion(res_dict_value):
         new_dict[key] = new_value
     return new_dict
 
-def other_input_values_conversion(res_dict_value):
+def other_input_values_conversion(res_dict_value, convert_to):
     """Decides how to convert inner values from dict valued PLS result `other_input`
+    Parameters
+    ----------
+    res_dict_value      :   dictionary from `other_input`
+    convert_to          :   string, choose whether converting to 'python' or
+                            'matlab'
+    Return
+    ------
+    new_dict            :   converted dictionary
     """
+    assert convert_to in ['python','matlab']
+
     new_dict = {}
     for key, value in res_dict_value.items():
         if key == 'meancentering_type':
-            new_value = bool(value)
+            if convert_to == 'python':
+                new_value = bool(value)
+            elif convert_to == 'matlab':
+                new_value = float(value)
         elif key == 'cormode':
-            new_value = bool(int(value))
+            if convert_to == 'python':
+                new_value = bool(int(value))
+            elif convert_to == 'matlab':
+                new_value = float(value)
         else:
             new_value = value
         new_dict[key] = new_value
     return new_dict
 
-def PLS_matlab_2_python(res):
+def PLS_result_conversion(res, convert_to):
     """Take a result from pls_analysis_py.m and convert it to an object with only python native types
+    Parameters
+    ----------
+    res                 :   result from behavioural PLS
+    convert_to          :   string, choose whether converting to 'python' or
+                            'matlab'
+    Return
+    ------
+    new_dict            :   converted dictionary
+
     """
+    assert convert_to in ['python','matlab']
+
     matlab_single_arrays = [
         'u',
         'v',
@@ -140,33 +233,72 @@ def PLS_matlab_2_python(res):
         'num_conditions'
     ]
     res_new = {}
+
+    if convert_to == 'matlab':
+        res = res.__dict__.copy()
     for key, value in res.items():
+        if key == 'method':
+            if convert_to == 'python':
+                new_value = int(value)
+            if convert_to == 'matlab':
+                new_value = float(value)
         if key == 'is_struct':
-            new_value = bool(int(value))
+            if convert_to == 'python':
+                new_value = bool(int(value))
+            elif convert_to == 'matlab':
+                new_value = float(value)
         elif key == 'datamatcorrs_lst':
-            new_value = np.array(value[0])
+            if convert_to == 'python':
+                new_value = np.array(value[0])
+            elif convert_to == 'matlab':
+                new_value = [matlab.single(value)]
         elif key in matlab_single_arrays:
-            new_value = np.array(value)
+            if convert_to == 'python':
+                new_value = np.array(value)
+            elif convert_to == 'matlab':
+                new_value = matlab.single(value)
         elif key in float_to_int:
-            new_value = int(value)
+            if convert_to == 'python':
+                new_value = int(value)
+            elif convert_to == 'matlab':
+                new_value = float(value)
         elif key == 'num_subj_lst':
-            new_value = np.array(value,dtype=np.int64)
+            if convert_to == 'python':
+                new_value = np.array(value,dtype=np.int64)
+            elif convert_to == 'matlab':
+                new_value = np.array(value,dtype=np.float64)
+                new_value = matlab.double(new_value)
         elif key in 'perm_result':
-            new_value = perm_result_values_conversion(value)
-            new_value = Dict2Object(new_value)
+            if convert_to == 'matlab':
+                value = value.__dict__
+            new_value = perm_result_values_conversion(value, convert_to=convert_to)
+            if convert_to == 'python':
+                new_value = Dict2Object(new_value)
         elif key in 'perm_splithalf':
-            new_value = perm_splithalf_values_conversion(value)
-            new_value = Dict2Object(new_value)
+            if convert_to == 'matlab':
+                value = value.__dict__
+            new_value = perm_splithalf_values_conversion(value, convert_to=convert_to)
+            if convert_to == 'python':
+                new_value = Dict2Object(new_value)
         elif key in 'boot_result':
-            new_value = boot_result_values_conversion(value)
-            new_value = Dict2Object(new_value)
+            if convert_to == 'matlab':
+                value = value.__dict__
+            new_value = boot_result_values_conversion(value, convert_to=convert_to)
+            if convert_to == 'python':
+                new_value = Dict2Object(new_value)
         elif key in 'other_input':
-            new_value = other_input_values_conversion(value)
-            new_value = Dict2Object(new_value)
+            if convert_to == 'matlab':
+                value = value.__dict__
+            new_value = other_input_values_conversion(value, convert_to=convert_to)
+            if convert_to == 'python':
+                new_value = Dict2Object(new_value)
         else:
             new_value = value
         res_new[key] = new_value
-    return Dict2Object(res_new)
+    if convert_to == 'python':
+        return Dict2Object(res_new)
+    elif convert_to == 'matlab':
+        return res_new
 
 def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     num_perm=0,
@@ -256,7 +388,8 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     if make_script:
         temp_script =   'function result = pls_analysis_py(datamat_lst, num_subj_lst, k, opt)\n' \
                         '    result_tmp = pls_analysis(datamat_lst, num_subj_lst, k, opt);\n' \
-                        '    result = rmfield(result_tmp,"field_descrip");'
+                        '    result = rmfield(result_tmp,"field_descrip");\n' \
+                        'end'
 
         with open('pls_analysis_py.m','w+') as f:
             f.write(temp_script)
@@ -282,9 +415,85 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     option['clim'] = matlab.double(clim)
 
     res = eng.pls_analysis_py(datamat_lst,num_subj_lst,num_cond,option)
-    res_py = PLS_matlab_2_python(res)
+    res_py = PLS_result_conversion(res, convert_to='python')
 
     if make_script:
         os.remove('pls_analysis_py.m')
 
     return res_py
+
+def load_pls_model(model_file, make_script=True):
+    """Load saved behavioural PLS model in matlab format (*.mat).
+    Warning that this creates (and removes when finished) a matlab script 
+    called `load_pls_model_py.m` to load the saved matlab PLS model, so make 
+    sure there isn't a script called `load_pls_model_py.m` in your working 
+    directory that you don't want deleted (not likely but worth mentioning). 
+    If you want to avoid the need for this you can copy the 
+    `load_pls_model_py.m` script from this repository to your PLS directory or a 
+    matlab path directory and set `make_script=False`.
+
+    Parameters
+    ----------
+    model_file          :   str path to *.mat matlab model file
+    make_script         :   bool, default=True. Whether to make and delete the
+                            load_pls_model_py.m file in the working directory.
+                            If you have copied this file to the PLS directory
+                            or a matlab path folder you can set this to False.
+
+    Return
+    ------
+    res_py              :   Object containing same outputs as original matlab 
+                            script, with same names, converted to python native
+                            types.
+                            Matlab single and double arrays are converted to 
+                            numpy ndarrays.
+                            Floats used as booleans in matlab (0.0 for False, 
+                            1.0 for True) are converted to boolean.
+                            Integers or floats being used as integers in matlab
+                            converted to int in python.
+                            Floats as python floats.
+    """
+    eng = matlab.engine.start_matlab()
+
+    # Matlab script for loading the file, accessing the struct inside, then returning
+    # (or first removing the "field_dscrip" field if it exists)
+    if make_script:
+        temp_script =   'function result = load_pls_model_py(model_file)\n' \
+                        '    result_tmp = load(model_file);\n' \
+                        '    fields = fieldnames(result_tmp);\n' \
+                        '    result_tmp2 = result_tmp.(fields{1});\n' \
+                        '    fields2 = fieldnames(result_tmp2);\n' \
+                        '    if ismember("field_descrip",fields2) == 1\n' \
+                        '       result = rmfield(result_tmp2,"field_descrip");\n' \
+                        '    else\n' \
+                        '       result = result_tmp2;\n' \
+                        '    end\n' \
+                        'end'
+
+    with open('load_pls_model_py.m','w+') as f:
+        f.write(temp_script)
+
+    res = eng.load_pls_model_py(model_file)
+    res_py = PLS_result_conversion(res, convert_to='python')
+
+    if make_script:
+        os.remove('load_pls_model_py.m')
+
+    return res_py
+
+def save_pls_model(model_file, res_py):
+    """Save behavioural PLS model in matlab format (*.mat).
+    Parameters
+    ----------
+    model_file          :   str path to *.mat matlab model file
+    res_py              :   model result from `pls_analysis` function
+
+    Return
+    ------
+    None
+    """
+    eng = matlab.engine.start_matlab()
+
+    res = PLS_result_conversion(res_py, convert_to='matlab')
+    eng.workspace['res'] = res
+    eng.save(model_file,'res',nargout=0)
