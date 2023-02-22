@@ -399,7 +399,7 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
 
     num_subj_lst = matlab.double(num_subj_lst)
 
-    if np.linalg.matrix_rank(stacked_behavdata) == 1:
+    if stacked_behavdata.ndim == 1:
         stacked_behavdata = stacked_behavdata[:,None]
     stacked_behavdata = matlab.double(stacked_behavdata.copy())
 
