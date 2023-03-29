@@ -162,7 +162,10 @@ def boot_result_values_conversion(res_dict_value, convert_to):
             elif (convert_to == 'matlab') and (key in matlab_double_arrays_to_float_numpy):
                 new_value = matlab.double(value)
             elif (convert_to == 'matlab') and (key in matlab_single_arrays):
-                new_value = matlab.single(value)
+                if value.shape==():
+                    new_value = matlab.single(float(value))
+                else:
+                    new_value = matlab.single(value)
         elif key in matlab_double_arrays_to_int_numpy:
             if convert_to == 'python':
                 new_value = np.array(value,dtype=np.int64)
@@ -256,7 +259,10 @@ def PLS_result_conversion(res, convert_to):
             if convert_to == 'python':
                 new_value = np.array(value)
             elif convert_to == 'matlab':
-                new_value = matlab.single(value)
+                if value.shape==():
+                    new_value = matlab.single(float(value))
+                else:
+                    new_value = matlab.single(value)
         elif key in float_to_int:
             if convert_to == 'python':
                 new_value = int(value)
