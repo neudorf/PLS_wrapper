@@ -38,17 +38,21 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     meancentering_type=0,
     cormode=0,
     boot_type='strat',
-    clim=95.0
+    clim=95.0,
+    make_script=True,
+    seed=None
     ):
-    """ 
-    Python wrapper for matlab implementation of pls_analysis.
+    """Python wrapper for matlab implementation of pls_analysis.
     Will use matlab python library to call the original matlab script.
     Warning that this creates (and removes when finished) a matlab script 
     called `pls_analysis_py.m` to call `pls_analysis.m` from the matlab PLS 
     package and removes the `field_descrip` variable (character arrays are 
     problematic, and this variable is not necessary), so make sure there isn't 
     a script called `pls_analysis_py.m` in your working directory that you 
-    don't want deleted (not likely but worth mentioning).
+    don't want deleted (not likely but worth mentioning). If you want to 
+    avoid the need for this you can copy the `pls_analysis_py.m` script from 
+    this repository to your PLS directory or a matlab path directory and set 
+    `make_script=False`.
 
     Parameters
     ----------
@@ -71,12 +75,15 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
                             are modulated by group membership. (Boost condition
                             differences, remove overall group diffrences).
                             1. Remove grand condition means from each group 
-                            condition mean. Tells us how conditions are 
-                            modulated by group membership (boost group 
-                            differences, remove overall condition diffrences).
+                            condition
+                            mean. Tells us how conditions are modulated by 
+                            group 
+                            membership (Boost group differences, remove overall
+                            condition diffrences).
                             2. Remove grand mean over all subjects and 
-                            conditions. Tells us full spectrum of condition and 
-                            group effects.
+                            conditions.
+                            Tells us full spectrum of condition and group 
+                            effects.
                             3. Remove all main effects by subtracting condition
                             and group means. This type of analysis will deal
                             with pure group by condition interaction.
@@ -93,6 +100,10 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
                             pls_analysis_py.m file in the working directory.
                             If you have copied this file to the PLS directory
                             or a matlab path folder you can set this to False.
+    seed                :   int, default=None. Seed to initialize rng random
+                            number generator in matlab. If none given, will
+                            be set to a random seed with python's 
+                            random.randitnt(1,2**32)
 
     Return
     ------

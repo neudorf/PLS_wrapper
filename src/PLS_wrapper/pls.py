@@ -1,6 +1,7 @@
 import matlab.engine
 import numpy as np
 import os
+import random
 
 class Dict2Object:
     """Takes a dictionary and turns it into a class with an attribute for each key.
@@ -314,7 +315,8 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
     cormode=0,
     boot_type='strat',
     clim=95.0,
-    make_script=True
+    make_script=True,
+    seed=None
     ):
     """Python wrapper for matlab implementation of pls_analysis.
     Will use matlab python library to call the original matlab script.
@@ -374,6 +376,10 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
                             pls_analysis_py.m file in the working directory.
                             If you have copied this file to the PLS directory
                             or a matlab path folder you can set this to False.
+    seed                :   int, default=None. Seed to initialize rng random
+                            number generator in matlab. If none given, will
+                            be set to a random seed with python's 
+                            random.randitnt(1,2**32)
 
     Return
     ------
@@ -389,6 +395,10 @@ def pls_analysis(datamat_lst,num_subj_lst,num_cond,stacked_behavdata,
                             Floats as python floats.
     """
     eng = matlab.engine.start_matlab()
+    if seed:
+        eng.rng(seed)
+    else:
+        eng.rng(random.randint(1,2**32))
 
     # Matlab script for calling pls_analysis.m and removing 'field_descrip'
     if make_script:
